@@ -27,15 +27,26 @@ class ReleaseTaskController {
     	params.taskType="email";
     	params.status="true";
 
-		//	println params
-        def releaseTaskInstance = new ReleaseTask(params)
-        if (!releaseTaskInstance.save(flush: true)) {
-            render(view: "create", model: [releaseTaskInstance: releaseTaskInstance])
-            return
-        }
+		def tasks =Tasks.getAll().each{
+			params.taskId = it.id
+        	params.executedDate=new Date()
+        	params.taskName=it.taskName
+        	params.taskType=it.taskType
+        	params.status="true";
+			println "params =="+params;	
+		
+			def releaseTaskInstance = new ReleaseTask(params)
+			releaseTaskInstance.save(flush: true)
+		}
+		
+        //def releaseTaskInstance = new ReleaseTask(params)
+        //if (!releaseTaskInstance.save(flush: true)) {
+          //  render(view: "create", model: [releaseTaskInstance: releaseTaskInstance])
+           // return
+       // }
 
-        flash.message = message(code: 'default.created.message', args: [message(code: 'releaseTask.label', default: 'ReleaseTask'), releaseTaskInstance.id])
-        redirect(action: "show", id: releaseTaskInstance.id)
+        flash.message = message(code: 'default.created.message', args: [message(code: 'releaseTask.label', default: 'ReleaseTask')])
+        redirect(action: "list")
     }
 
     def show(Long id) {
